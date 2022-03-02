@@ -3,6 +3,9 @@ Covid 19 Data Exploration in mysql
 Skills used: Joins, CTE's, Temp Tables, Windows Functions, Aggregate Functions, Creating Views, Converting Data Types
 
 Data from: https://ourworldindata.org/covid-deaths
+
+For the pourposes of this project, I split the original table into two. The resultant tables are titled "coviddeaths" & covidvaccinations." This was done to allow
+me to show a join later on in the data exploration. Both tables share the "iso_code","continent","location", & "date" columns.
 */
 
 -- turn off safe updates to edit tables
