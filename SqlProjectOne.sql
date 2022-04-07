@@ -1,15 +1,10 @@
 /*
 Covid 19 Data Exploration in mysql
-Skills used: Joins, CTE's, Temp Tables, Windows Functions, Aggregate Functions, Creating Views, Converting Data Types
+Skills used: Joins, CTE's, Temp Tables, Windows Functions, Aggregate Functions, Creating Views, 
+Converting Data Types
 
 Data from: https://ourworldindata.org/covid-deaths
-
-For the pourposes of this project, I split the original table into two. The resultant tables are titled "coviddeaths" & covidvaccinations." This was done to allow
-me to show a join later on in the data exploration. Both tables share the "iso_code","continent","location", & "date" columns.
 */
-
--- turn off safe updates to edit tables
-SET SQL_SAFE_UPDATES=0;
 
 /*=================================================================================================
 Convert the date column from "mm/dd/yy" to "yyyy-mm-dd" DATE type for the "coviddeaths" table
@@ -191,3 +186,55 @@ JOIN projects.covidvaccinations v
 	on d.location = v.location
     and d.date = v.date
 WHERE d.continent is not null;
+
+/*==============================================================================================
+  Creating queries for Tableau dashboard
+===============================================================================================*/
+/* For this project I'll be working with tableau public, which to my understanding doesn't interface with SQL.
+   To get around this, I run these commands in Mysqlworkbench, and export the resault tables to Excel. 
+   My Tableau Public account can be found at:
+   https://public.tableau.com/app/profile/kaleb.maraccini/
+*/
+-- 1. 
+
+SELECT SUM(new_cases) as total_cases, SUM(new_deaths) as total_deaths, SUM(new_deaths)/SUM(new_cases)*100 as death_percentage
+FROM projects.coviddeaths
+WHERE continent is not null
+ORDER BY 1,2;
+
+-- 2. 
+
+-- We take these out as they are not inluded in the above queries and want to stay consistent
+-- European Union is part of Europe
+
+Select location, SUM(new_deaths) as total_deaths
+From projects.coviddeaths
+Where continent is not null 
+and location not in ('World', 'European Union', 'International', 'Upper middle income','High income', 'Europe', 'North America',
+'South America', 'Asia','Lower middle income','Low income','Oceania')
+Group by location
+order by total_deaths desc;
+
+
+-- 3.
+
+SELECT location, population, MAX(total_cases) AS highest_infection_count, MAX((total_cases/population))*100 as
+	percent_population_infected
+FROM projects.coviddeaths
+Where continent is not null 
+and location not in ('World', 'European Union', 'International', 'Upper middle income','High income', 'Europe', 'North America',
+'South America', 'Asia','Lower middle income','Low income','Oceania')
+GROUP BY location, population
+ORDER BY percent_population_infected DESC;
+
+
+-- 4.
+
+SELECT location, population, date, MAX(total_cases) AS highest_infection_count, MAX((total_cases/population))*100 as
+	percent_population_infected
+FROM projects.coviddeaths
+Where continent is not null 
+and location not in ('World', 'European Union', 'International', 'Upper middle income','High income', 'Europe', 'North America',
+'South America', 'Asia','Lower middle income','Low income','Oceania')
+GROUP BY location, population, date
+ORDER BY percent_population_infected DESC;
