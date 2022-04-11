@@ -23,7 +23,7 @@ month = SUBSTRING_INDEX(date,'/',1),
 day = SUBSTRING_INDEX(SUBSTRING_INDEX(date,'/',2),'/',-1),
 year =SUBSTRING_INDEX(date,'/',-1);
 
--- add 20 to year column, and 0 to day & month if = 1-9
+-- add 20 to year column, and 0 to day & month if single char
 UPDATE projects.coviddeaths SET
 year = CONCAT('20',year);
 
@@ -42,6 +42,7 @@ date = CONCAT_WS('-',year,month,day);
 /* Convert the date column to type DATETIME and then to DATE. Unsure why, but when I tried to convert from varchar 
    to date it did not work. However varchar -> datetime -> date, worked fine. This will reduce the size of the date 
    column from 8 bytes to 3 */
+   
 UPDATE projects.coviddeaths SET
 date = CONVERT(date, DATETIME),
 date = CONVERT(date, DATE);
@@ -192,6 +193,7 @@ WHERE d.continent is not null;
 ===============================================================================================*/
 /* For this project I'll be working with tableau public, which to my understanding doesn't interface with SQL.
    To get around this, I run these commands in Mysqlworkbench, and export the resault tables to Excel. 
+   
    My Tableau Public account can be found at:
    https://public.tableau.com/app/profile/kaleb.maraccini/
 */
@@ -203,9 +205,6 @@ WHERE continent is not null
 ORDER BY 1,2;
 
 -- 2. 
-
--- We take these out as they are not inluded in the above queries and want to stay consistent
--- European Union is part of Europe
 
 Select location, SUM(new_deaths) as total_deaths
 From projects.coviddeaths
